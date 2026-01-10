@@ -47,9 +47,9 @@
 //#define I2C_USE_LONG_TRANSFER
 
 // USB config
-//#define USB_ENABLE
-//#define USB_CLASS_CDC
-//#define USB_CDC_BFR_SIZE	512
+#define USB_ENABLE
+#define USB_CLASS_CDC
+#define USB_CDC_BFR_SIZE	512
 #define USB_PD				2
 #define USB_PD_SINK
 
