@@ -1,5 +1,5 @@
-#ifndef LIS2DH_H
-#define LIS2HH_H
+#ifndef LIS2DT_H
+#define LIS2DT_H
 
 #include "STM32X.h"
 
@@ -34,4 +34,4 @@ void LIS2_EnableFilter(uint8_t div, bool high_pass);
 
 bool LIS2_IsIntSet(void);
 
-#endif //LIS2DH_H
+#endif //LIS2DT_H

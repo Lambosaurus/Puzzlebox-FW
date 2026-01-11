@@ -29,7 +29,8 @@
 
 // TIM config
 //#define TIM_USE_IRQS
-//#define TIM2_ENABLE
+#define TIM2_ENABLE
+#define TIM16_ENABLE
 
 // UART config
 #define UART1_PINS			(PA9 | PA10)
@@ -73,12 +74,12 @@
 #define BUZZER_PIN			PB8
 #define BUZZER_TIM			TIM_16
 #define BUZZER_TIM_CH		TIM_CH1
-#define BUZZER_TIM_AF		GPIO_AF2_TIM16
+#define BUZZER_PIN_AF		GPIO_AF2_TIM16
 
 #define BACKLIGHT_PIN		PA3
 #define BACKLIGHT_TIM		TIM_2
 #define BACKLIGHT_TIM_CH	TIM_CH4
-#define BACKLIGHT_TIM_AF	GPIO_AF2_TIM2
+#define BACKLIGHT_PIN_AF	GPIO_AF2_TIM2
 
 #define DISPLAY_SPI			SPI_1
 #define DISPLAY_CS_PIN		PB1
@@ -96,6 +97,10 @@
 
 #define VL53_XSHUT_PIN		PB5
 #define VL53_I2C			BOARD_I2C
+
+#define VEML3328_I2C		BOARD_I2C
+
+#define BME280_I2C			BOARD_I2C
 
 #define M24XX_SERIES		512
 #define M24XX_I2C			BOARD_I2C
