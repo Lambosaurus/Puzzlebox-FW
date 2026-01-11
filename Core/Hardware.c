@@ -38,6 +38,11 @@ void HW_Init(void)
 	GPIO_EnableOutput(BOARD_PWR_PIN, false);
 	GPIO_EnableOutput(VBATT_SNS_EN_PIN, false);
 
+	GPIO_EnableInput(TOUCH_KEY_0, GPIO_Pull_Down);
+	GPIO_EnableInput(TOUCH_KEY_1, GPIO_Pull_Down);
+	GPIO_EnableInput(TOUCH_KEY_2, GPIO_Pull_Down);
+	GPIO_EnableInput(TOUCH_KEY_3, GPIO_Pull_Down);
+
 	I2C_Init(BOARD_I2C, I2C_Mode_Fast);
 }
 
@@ -73,6 +78,20 @@ uint32_t HW_ReadVBatt(void)
 	ADC_Deinit();
 
 	return mv;
+}
+
+uint8_t HW_ReadKeys(void)
+{
+	uint8_t keys = 0;
+	if (GPIO_Read(TOUCH_KEY_0))
+		keys |= 0x01;
+	if (GPIO_Read(TOUCH_KEY_1))
+		keys |= 0x02;
+	if (GPIO_Read(TOUCH_KEY_2))
+		keys |= 0x04;
+	if (GPIO_Read(TOUCH_KEY_3))
+		keys |= 0x08;
+	return keys;
 }
 
 /*
