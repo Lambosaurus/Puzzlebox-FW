@@ -92,8 +92,8 @@
 #define LOG_PRINT_COLOR
 #define LOG_PRINT_TIMESTAMP
 
-#define LIS2_INT_PIN		PB4
-#define LIS2_I2C			BOARD_I2C
+#define LIS2DT_INT_PIN		PB4
+#define LIS2DT_I2C			BOARD_I2C
 
 #define VL53_XSHUT_PIN		PB5
 #define VL53_I2C			BOARD_I2C
@@ -101,6 +101,8 @@
 #define VEML3328_I2C		BOARD_I2C
 
 #define BME280_I2C			BOARD_I2C
+
+#define LIS2MD_I2C			BOARD_I2C
 
 #define M24XX_SERIES		512
 #define M24XX_I2C			BOARD_I2C
