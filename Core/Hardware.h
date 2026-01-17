@@ -23,6 +23,7 @@ bool HW_ReadButton(void);
 void HW_SetPower(bool enable);
 uint32_t HW_ReadVBatt(void);
 uint8_t HW_ReadKeys(void);
+void HW_SetBacklight(uint8_t pct);
 
 /*
  * EXTERN DECLARATIONS
