@@ -19,7 +19,7 @@
 #define ST7571_CMD_MODE_DEFAULT				0x54
 
 #define ST7571_CMD_CONTRAST					0x81
-#define ST7571_CMD_CONTRAST_DEFAULT			16
+#define ST7571_CMD_CONTRAST_DEFAULT			20
 
 #define ST7571_CMD_PWRCTL_ON1				0x2C
 #define ST7571_CMD_PWRCTL_ON2				0x2E
@@ -63,8 +63,10 @@
 #define ST7571_CMD_COLORMODE_BW				0x11
 #define ST7571_CMD_COLORMDOE_GREY			0x10
 
-
+#ifndef ST7571_BPP
 #define ST7571_BPP							1 // Bits per pixel
+#endif
+
 #define ST7571_COL_COUNT					(ST7571_WIDTH)
 #define ST7571_PAGE_COUNT					(ST7571_HEIGHT / 8)
 #define ST7571_COL_OFFSET					0
@@ -288,19 +290,13 @@ void ST7571_DrawImage(uint8_t x, uint8_t y, const uint8_t * img, uint8_t width, 
 	{
 		return;
 	}
+
+	uint32_t row_bytes = width * ST7571_BPP;
+
 	if (x + width > ST7571_WIDTH)
-	{
-		// truncating the width is easy. We just draw less columns.
 		width = ST7571_WIDTH - x;
-	}
-
-	uint32_t col_bytes = (height + 7) / 8;
-
 	if (y + height > ST7571_HEIGHT)
-	{
-		// Note, this means that the number of touched pages may be less than col_bytes.
 		height = ST7571_HEIGHT - y;
-	}
 
 	uint8_t row0_offset = y & 0x07;
 	uint8_t row1_offset = 8 - row0_offset;
@@ -309,50 +305,43 @@ void ST7571_DrawImage(uint8_t x, uint8_t y, const uint8_t * img, uint8_t width, 
 	if (row0_offset == 0)
 	{
 		// Writes are page aligned.
-
-		// Images are stored column by column.
-		for (uint32_t ix = 0; ix < width; ix++)
+		for (uint8_t page = y / 8; page <= last_page; page++)
 		{
-			uint8_t col = x + ix;
-			uint8_t page = y / 8;
-			for (uint32_t iy = 0; iy < col_bytes; iy++, img += ST7571_BPP)
+			uint8_t * dst = ST7571_GetPage(page, x);
+			const uint8_t * src = img;
+			img += row_bytes;
+
+			for (uint8_t ix = 0; ix < (width * ST7571_BPP); ix++)
 			{
-				// Each byte is 8 vertical bits, matching the display format.
-				if (page > last_page) { continue; }
-				uint8_t * dst = ST7571_GetPage(page++, col);
-				*(dst) 		|= *img;
-#if ST7571_BPP == 2
-				*(dst+1) 	|= *(img+1);
-#endif
+				*dst++ |= *src++;
 			}
 		}
+
 	}
 	else
 	{
 		// Writes not page aligned. Need to hit two rows.
-		for (uint32_t ix = 0; ix < width; ix++)
+		for (uint8_t page = y / 8; page < last_page; page++)
 		{
-			uint8_t col = x + ix;
-			uint8_t page = y / 8;
-			for (uint32_t iy = 0; iy < col_bytes; iy++, img++)
-			{
-				// Each byte is 8 vertical bits, matching the display format.
-				if (page > last_page) { continue; }
-				uint8_t * dst;
-				dst = ST7571_GetPage(page++, col);
-				*(dst) 		|= *img	 	<< row0_offset;
-#if ST7571_BPP == 2
-				*(dst+1) 	|= *(img+1) << row0_offset;
-#endif
+			uint8_t * dst0 = ST7571_GetPage(page, x);
+			uint8_t * dst1 = ST7571_GetPage(page+1, x);
+			const uint8_t * src = img;
+			img += row_bytes;
 
-				if (page > last_page) { continue; }
-				dst = ST7571_GetPage(page, col);
-				*(dst) 		|= *img 	>> row1_offset;
-#if ST7571_BPP == 2
-				*(dst+1) 	|= *(img+1) >> row1_offset;
-#endif
+			for (uint8_t ix = 0; ix < (width * ST7571_BPP); ix++)
+			{
+				*dst0++ |= (*src) << row0_offset;
+				*dst1++ |= (*src++) >> row1_offset;
 			}
 		}
+
+		// last page
+		uint8_t * dst = ST7571_GetPage(last_page, x);
+		for (uint8_t ix = 0; ix < (width * ST7571_BPP); ix++)
+		{
+			*dst++ |= (*img++) << row0_offset;
+		}
+
 	}
 
 #ifdef ST7571_TRACK_PAGE_EDITS
